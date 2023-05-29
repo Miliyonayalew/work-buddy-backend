@@ -5,6 +5,10 @@ const validator = require('validator')
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
+  full_name: {
+    type: String,
+    required: true,
+  },
   email: {
     type: String,
     required: true,
@@ -17,9 +21,12 @@ const userSchema = new Schema({
 })
 
 // Signup
-userSchema.statics.signup = async function (email, password) {
+userSchema.statics.signup = async function (full_name, email, password) {
   
   //Validation
+  if(!full_name) {
+    throw Error('Full Name is required')
+  }
   if(!email || !password) {
     throw Error('Email and Password are required')
   }
@@ -39,7 +46,7 @@ userSchema.statics.signup = async function (email, password) {
   const salt = await bcrypt.genSalt(10)
   const hash = await bcrypt.hash(password, salt)
 
-  const user = await this.create({email, password: hash})
+  const user = await this.create({full_name, email, password: hash})
 
   return user
 }
